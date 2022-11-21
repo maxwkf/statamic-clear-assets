@@ -90,6 +90,23 @@ class ClearAssets extends Command
             });
         });
 
+        // This amendment should be using with the statamic/eloquent-driver
+        // The eloquent-driver provides ability to store entries in database
+        // So, I need to get also all the entires in database to check if there are pictures using in there
+        $entries = \Statamic\Facades\Entry::all();
+        
+        $entries->each(function(\Statamic\Eloquent\Entries\Entry $entry) use ($assets) {
+            $contents = serialize($entry->data());
+
+            $assets->each(function ($asset, $index) use ($contents, $assets) {
+                // If asset is used in content, then remove it from unused list.
+                if ( (strpos($contents, $asset->path()) !== false) 
+                        || $asset->container->disk == 'svg_icons' ) {
+                    $assets->forget($index);
+                }
+            });
+        });
+
         return $assets->values();
     }
 
