@@ -104,6 +104,11 @@ class ClearAssets extends Command
                         || $asset->container->disk == 'svg_icons' ) {
                     $assets->forget($index);
                 }
+
+                // If assets in env custom path, remove it from unused list.
+                if ( in_array('/assets/' . $asset->path(), [env('STATAMIC_CUSTOM_LOGO_URL'), env('STATAMIC_CUSTOM_FAVICON_URL')]) ) {
+                    $assets->forget($index);
+                }
             });
         });
 
